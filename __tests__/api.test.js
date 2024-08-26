@@ -35,3 +35,25 @@ describe("/api/topics", () => {
         });
     });
 });
+
+describe("/api", () => {
+    describe("GET", () => {
+        test("200: status code of 200 is sent", () => {
+            return request(app).get("/api").expect(200);
+        });
+        test("200: Responds with the body of endpoints.json", () => {
+            return request(app)
+                .get("/api")
+                .expect(200)
+                .then(({ body: { endpoints } }) => {
+                    expect(typeof endpoints).toBe("object");
+                    expect(endpoints).toHaveProperty("GET /api");
+                    expect(endpoints).toHaveProperty("GET /api/topics");
+                    expect(endpoints).toHaveProperty("GET /api/articles");
+                    Object.values(endpoints).forEach((endpoint) => {
+                        expect(endpoint).toHaveProperty("description");
+                    });
+                });
+        });
+    });
+});
