@@ -9,9 +9,6 @@ afterAll(() => db.end());
 
 describe("/api/topics", () => {
     describe("GET", () => {
-        test("200: status code of 200 is sent", () => {
-            return request(app).get("/api/topics").expect(200);
-        });
         test("200: Responds with an array of topic objects, each of which a slug and description property", () => {
             return request(app)
                 .get("/api/topics")
@@ -38,9 +35,6 @@ describe("/api/topics", () => {
 
 describe("/api", () => {
     describe("GET", () => {
-        test("200: status code of 200 is sent", () => {
-            return request(app).get("/api").expect(200);
-        });
         test("200: Responds with the body of endpoints.json", () => {
             return request(app)
                 .get("/api")
@@ -60,9 +54,6 @@ describe("/api", () => {
 
 describe("/api/articles/:article_id", () => {
     describe("GET", () => {
-        test("200: status code of 200 is sent", () => {
-            return request(app).get("/api/articles/1").expect(200);
-        });
         test("200: responds with an article object, which has appropriate properties", () => {
             return request(app)
                 .get("/api/articles/1")
@@ -103,18 +94,47 @@ describe("/api/articles/:article_id", () => {
     });
 });
 
-/*
-
-an article object, which should have the following properties:
-author
-title
-article_id
-body
-topic
-created_at
-votes
-article_img_url
-
-
-
-*/
+describe("/api/articles", () => {
+    describe("GET", () => {
+        test("200: Responds with an array of article objects, each of which has appropriate properties (excluding comment_count which is next test)", () => {
+            return request(app)
+                .get("/api/articles")
+                .expect(200)
+                .then(({ body: { articles } }) => {
+                    expect(Array.isArray(articles)).toBe(true);
+                    expect(articles).toHaveLength(13);
+                    articles.forEach((article) => {
+                        expect(article).toHaveProperty("article_id", expect.any(Number));
+                        expect(article).toHaveProperty("title", expect.any(String));
+                        expect(article).toHaveProperty("topic", expect.any(String));
+                        expect(article).toHaveProperty("author", expect.any(String));
+                        expect(article).toHaveProperty("created_at", expect.any(String));
+                        expect(article).toHaveProperty("votes", expect.any(Number));
+                        expect(article).toHaveProperty("article_img_url", expect.any(String));
+                        expect(article).not.toHaveProperty("body");
+                    });
+                });
+        });
+        test("200: Each article object includes a comment_count property which is the sum of comments associated with that article", () => {
+            return request(app)
+                .get("/api/articles")
+                .expect(200)
+                .then(({ body: { articles } }) => {
+                    const article1 = articles.find((article) => article.article_id === 1);
+                    const article2 = articles.find((article) => article.article_id === 2);
+                    const article3 = articles.find((article) => article.article_id === 3);
+                    expect(article1).toHaveProperty("comment_count", "11");
+                    expect(article2).toHaveProperty("comment_count", "0");
+                    expect(article3).toHaveProperty("comment_count", "2");
+                });
+        });
+        test("200: Articles are sorted by date in descending order", () => {
+            return request(app)
+                .get("/api/articles")
+                .expect(200)
+                .then(({ body: { articles } }) => {
+                    expect(articles).toBeSortedBy("created_at", { descending: true });
+                });
+        });
+    });
+});
