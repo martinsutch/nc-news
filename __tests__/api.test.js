@@ -184,4 +184,51 @@ describe("/api/articles/:article_id/comments", () => {
                 });
         });
     });
+    describe("POST", () => {
+        test("201: Responds with the posted comment", () => {
+            return request(app)
+                .post("/api/articles/2/comments")
+                .send({ username: "lurker", body: "example body of text" })
+                .expect(201)
+                .then(({ body: { comment } }) => {
+                    expect(comment).toEqual(
+                        expect.objectContaining({
+                            comment_id: expect.any(Number),
+                            votes: 0,
+                            created_at: expect.any(String),
+                            author: "lurker",
+                            body: "example body of text",
+                            article_id: 2,
+                        })
+                    );
+                });
+        });
+        test("400:sends an appropriate status and error message when not provided sufficient data", () => {
+            return request(app)
+                .post("/api/articles/2/comments")
+                .send({ username: "lurker" })
+                .expect(400)
+                .then(({ body: { msg } }) => {
+                    expect(msg).toBe("Bad request");
+                });
+        });
+        test("404: sends an appropriate status and error message when given an non-existant username", () => {
+            return request(app)
+                .post("/api/articles/2/comments")
+                .send({ username: "unknown", body: "example body of text" })
+                .expect(404)
+                .then(({ body: { msg } }) => {
+                    expect(msg).toBe("User not found");
+                });
+        });
+        test("404: sends an appropriate status and error message when given a non-existant id", () => {
+            return request(app)
+                .post("/api/articles/9999/comments")
+                .send({ username: "lurker", body: "example body of text" })
+                .expect(404)
+                .then(({ body: { msg } }) => {
+                    expect(msg).toBe("Article not found");
+                });
+        });
+    });
 });
