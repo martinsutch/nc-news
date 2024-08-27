@@ -138,3 +138,50 @@ describe("/api/articles", () => {
         });
     });
 });
+
+describe("/api/articles/:article_id/comments", () => {
+    describe("GET", () => {
+        test("200: Responds with an array of comment objects, each of which has appropriate properties", () => {
+            return request(app)
+                .get("/api/articles/1/comments")
+                .expect(200)
+                .then(({ body: { comments } }) => {
+                    expect(Array.isArray(comments)).toBe(true);
+                    expect(comments).toHaveLength(11);
+                    comments.forEach((comment) => {
+                        expect(comment).toHaveProperty("comment_id", expect.any(Number));
+                        expect(comment).toHaveProperty("votes", expect.any(Number));
+                        expect(comment).toHaveProperty("created_at", expect.any(String));
+                        expect(comment).toHaveProperty("author", expect.any(String));
+                        expect(comment).toHaveProperty("body", expect.any(String));
+                        expect(comment).toHaveProperty("article_id", expect.any(Number));
+                    });
+                });
+        });
+        test("200: Comments are sorted by date in descending order", () => {
+            return request(app)
+                .get("/api/articles/1/comments")
+                .expect(200)
+                .then(({ body: { comments } }) => {
+                    expect(comments).toBeSortedBy("created_at", { descending: true });
+                });
+        });
+        test("200: Responds with an empty array if the article has no comments", () => {
+            return request(app)
+                .get("/api/articles/2/comments")
+                .expect(200)
+                .then(({ body: { comments } }) => {
+                    expect(Array.isArray(comments)).toBe(true);
+                    expect(comments).toHaveLength(0);
+                });
+        });
+        test("404: sends an appropriate status and error message when given a non-existant id", () => {
+            return request(app)
+                .get("/api/articles/9999/comments")
+                .expect(404)
+                .then(({ body: { msg } }) => {
+                    expect(msg).toBe("Article not found");
+                });
+        });
+    });
+});
