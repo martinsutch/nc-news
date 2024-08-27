@@ -45,18 +45,6 @@ You'll need the following set up on your system:
     npm install
     ```
 
-    ```
-    npm install express
-    ```
-
-    ```
-    npm install supertest --save-dev
-    ```
-
-    ```
-    npm install jest-sorted --save-dev
-    ```
-
 4. **Create and Seed the Databases:**
 
     Create the databases:
