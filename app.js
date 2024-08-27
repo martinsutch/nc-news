@@ -8,10 +8,11 @@ const {
     invalidInputErrorHandler,
 } = require("./error-handlers.js");
 const { getEndpoints } = require("./controllers/api-controller.js");
-const { getArticleById } = require("./controllers/articles-controller.js");
+const { getArticleById, getArticles } = require("./controllers/articles-controller.js");
 
 app.get("/api", getEndpoints);
 app.get("/api/topics", getTopics);
+app.get("/api/articles", getArticles);
 app.get("/api/articles/:article_id", getArticleById);
 
 app.all("/*", routeErrorHandler);
