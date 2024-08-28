@@ -10,7 +10,7 @@ const {
     invalidInputErrorHandler,
 } = require("./error-handlers.js");
 const { getEndpoints } = require("./controllers/api-controller.js");
-const { getArticleById, getArticles } = require("./controllers/articles-controller.js");
+const { getArticleById, getArticles, patchArticleById } = require("./controllers/articles-controller.js");
 const { getCommentsByArticle, postCommentByArticle } = require("./controllers/comments-controller.js");
 
 app.get("/api", getEndpoints);
@@ -20,6 +20,8 @@ app.get("/api/articles/:article_id", getArticleById);
 app.get("/api/articles/:article_id/comments", getCommentsByArticle);
 
 app.post("/api/articles/:article_id/comments", postCommentByArticle);
+
+app.patch("/api/articles/:article_id", patchArticleById);
 
 app.all("/*", routeErrorHandler);
 app.use(invalidInputErrorHandler);
