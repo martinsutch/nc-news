@@ -167,45 +167,109 @@ describe("/api/articles/:article_id", () => {
 
 describe("/api/articles", () => {
     describe("GET", () => {
-        test("200: Responds with an array of article objects, each of which has appropriate properties (excluding comment_count which is next test)", () => {
-            return request(app)
-                .get("/api/articles")
-                .expect(200)
-                .then(({ body: { articles } }) => {
-                    expect(Array.isArray(articles)).toBe(true);
-                    expect(articles).toHaveLength(13);
-                    articles.forEach((article) => {
-                        expect(article).toHaveProperty("article_id", expect.any(Number));
-                        expect(article).toHaveProperty("title", expect.any(String));
-                        expect(article).toHaveProperty("topic", expect.any(String));
-                        expect(article).toHaveProperty("author", expect.any(String));
-                        expect(article).toHaveProperty("created_at", expect.any(String));
-                        expect(article).toHaveProperty("votes", expect.any(Number));
-                        expect(article).toHaveProperty("article_img_url", expect.any(String));
-                        expect(article).not.toHaveProperty("body");
+        describe("standard requests", () => {
+            test("200: Responds with an array of article objects, each of which has appropriate properties (excluding comment_count which is next test)", () => {
+                return request(app)
+                    .get("/api/articles")
+                    .expect(200)
+                    .then(({ body: { articles } }) => {
+                        expect(Array.isArray(articles)).toBe(true);
+                        expect(articles).toHaveLength(13);
+                        articles.forEach((article) => {
+                            expect(article).toEqual(
+                                expect.objectContaining({
+                                    article_id: expect.any(Number),
+                                    title: expect.any(String),
+                                    topic: expect.any(String),
+                                    author: expect.any(String),
+                                    created_at: expect.any(String),
+                                    votes: expect.any(Number),
+                                    article_img_url: expect.any(String),
+                                })
+                            );
+                            expect(article).not.toHaveProperty("body");
+                        });
                     });
-                });
+            });
+            test("200: Each article object includes a comment_count property which is the sum of comments associated with that article", () => {
+                return request(app)
+                    .get("/api/articles")
+                    .expect(200)
+                    .then(({ body: { articles } }) => {
+                        const article1 = articles.find((article) => article.article_id === 1);
+                        const article2 = articles.find((article) => article.article_id === 2);
+                        const article3 = articles.find((article) => article.article_id === 3);
+                        expect(article1).toHaveProperty("comment_count", "11");
+                        expect(article2).toHaveProperty("comment_count", "0");
+                        expect(article3).toHaveProperty("comment_count", "2");
+                    });
+            });
+            test("200: Articles are sorted by date in descending order by default", () => {
+                return request(app)
+                    .get("/api/articles")
+                    .expect(200)
+                    .then(({ body: { articles } }) => {
+                        expect(articles).toBeSortedBy("created_at", { descending: true });
+                    });
+            });
         });
-        test("200: Each article object includes a comment_count property which is the sum of comments associated with that article", () => {
-            return request(app)
-                .get("/api/articles")
-                .expect(200)
-                .then(({ body: { articles } }) => {
-                    const article1 = articles.find((article) => article.article_id === 1);
-                    const article2 = articles.find((article) => article.article_id === 2);
-                    const article3 = articles.find((article) => article.article_id === 3);
-                    expect(article1).toHaveProperty("comment_count", "11");
-                    expect(article2).toHaveProperty("comment_count", "0");
-                    expect(article3).toHaveProperty("comment_count", "2");
-                });
-        });
-        test("200: Articles are sorted by date in descending order", () => {
-            return request(app)
-                .get("/api/articles")
-                .expect(200)
-                .then(({ body: { articles } }) => {
-                    expect(articles).toBeSortedBy("created_at", { descending: true });
-                });
+        describe("sorting queries", () => {
+            test("200: order=ASC query orders articles by date in ascending order", () => {
+                return request(app)
+                    .get("/api/articles?order=ASC")
+                    .expect(200)
+                    .then(({ body: { articles } }) => {
+                        expect(articles).toBeSortedBy("created_at", { descending: false });
+                    });
+            });
+            test("200: order=asc query works regardless of value case", () => {
+                return request(app)
+                    .get("/api/articles?order=asc")
+                    .expect(200)
+                    .then(({ body: { articles } }) => {
+                        expect(articles).toBeSortedBy("created_at", { descending: false });
+                    });
+            });
+            test("400: sends an appropriate status and error message when not provided asc or desc as order", () => {
+                return request(app)
+                    .get("/api/articles?order=up")
+                    .expect(400)
+                    .then(({ body: { msg } }) => {
+                        expect(msg).toBe("Bad request");
+                    });
+            });
+            test("200: Ignores unknown queries and continues with request", () => {
+                return request(app)
+                    .get("/api/articles?dancing=true")
+                    .expect(200)
+                    .then(({ body: { articles } }) => {
+                        expect(articles).toBeSortedBy("created_at", { descending: true });
+                    });
+            });
+            test("200: sort_by=author query responds with articles sorted by author in descending order by default", () => {
+                return request(app)
+                    .get("/api/articles?sort_by=author")
+                    .expect(200)
+                    .then(({ body: { articles } }) => {
+                        expect(articles).toBeSortedBy("author", { descending: true });
+                    });
+            });
+            test("200: sort_by=votes&order=asc queries responds with articles sorted by author in ascending order", () => {
+                return request(app)
+                    .get("/api/articles?sort_by=votes&order=asc")
+                    .expect(200)
+                    .then(({ body: { articles } }) => {
+                        expect(articles).toBeSortedBy("votes", { descending: false });
+                    });
+            });
+            test("400: sends an appropriate status and error message when given an invalid sort_by value", () => {
+                return request(app)
+                    .get("/api/articles?sort_by=fabulousness")
+                    .expect(400)
+                    .then(({ body: { msg } }) => {
+                        expect(msg).toBe("Bad request");
+                    });
+            });
         });
     });
 });
