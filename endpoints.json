@@ -96,5 +96,8 @@
                 "article_img_url": "image url"
             }
         }
+    },
+    "DELETE /api/comments/:comment_id": {
+        "description": "deletes the comment matching the parametric comment id provided"
     }
 }

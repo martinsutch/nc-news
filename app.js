@@ -11,7 +11,11 @@ const {
 } = require("./error-handlers.js");
 const { getEndpoints } = require("./controllers/api-controller.js");
 const { getArticleById, getArticles, patchArticleById } = require("./controllers/articles-controller.js");
-const { getCommentsByArticle, postCommentByArticle } = require("./controllers/comments-controller.js");
+const {
+    getCommentsByArticle,
+    postCommentByArticle,
+    deleteCommentById,
+} = require("./controllers/comments-controller.js");
 
 app.get("/api", getEndpoints);
 app.get("/api/topics", getTopics);
@@ -22,6 +26,8 @@ app.get("/api/articles/:article_id/comments", getCommentsByArticle);
 app.post("/api/articles/:article_id/comments", postCommentByArticle);
 
 app.patch("/api/articles/:article_id", patchArticleById);
+
+app.delete("/api/comments/:comment_id", deleteCommentById);
 
 app.all("/*", routeErrorHandler);
 app.use(invalidInputErrorHandler);
