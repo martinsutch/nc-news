@@ -1,5 +1,5 @@
 const { articleById } = require("../models/articles-model");
-const { commentsByArticle, postComment } = require("../models/comments-model");
+const { commentsByArticle, postComment, deleteComment } = require("../models/comments-model");
 const { userByUsername } = require("../models/users-model");
 
 exports.getCommentsByArticle = (req, res, next) => {
@@ -27,6 +27,17 @@ exports.postCommentByArticle = (req, res, next) => {
         })
         .then((comment) => {
             res.status(201).send({ comment });
+        })
+        .catch((err) => {
+            next(err);
+        });
+};
+
+exports.deleteCommentById = (req, res, next) => {
+    const { comment_id } = req.params;
+    deleteComment(comment_id)
+        .then(() => {
+            res.status(204).send();
         })
         .catch((err) => {
             next(err);

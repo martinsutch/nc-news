@@ -303,3 +303,32 @@ describe("/api/articles/:article_id/comments", () => {
         });
     });
 });
+
+describe("/api/comments/:comment_id", () => {
+    describe("DELETE", () => {
+        test("Responds with status 204 and no content when comment is deleted", () => {
+            return request(app)
+                .delete("/api/comments/1")
+                .expect(204)
+                .then(({ body }) => {
+                    expect(body).toEqual({});
+                });
+        });
+        test("400: sends an appropriate status and error message when given an invalid id", () => {
+            return request(app)
+                .delete("/api/comments/unicorn")
+                .expect(400)
+                .then(({ body: { msg } }) => {
+                    expect(msg).toBe("Bad request");
+                });
+        });
+        test("404: sends an appropriate status and error message when given a non-existant id", () => {
+            return request(app)
+                .delete("/api/comments/9999")
+                .expect(404)
+                .then(({ body: { msg } }) => {
+                    expect(msg).toBe("Comment not found");
+                });
+        });
+    });
+});
