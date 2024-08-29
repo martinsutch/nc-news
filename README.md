@@ -2,7 +2,44 @@
 
 ## Description
 
-This is an API for the purpose of accessing application data programmatically. The intention here is to mimic the building of a real world backend service (such as Reddit) which provides this information to the front end architecture.
+This is an API for the purpose of accessing application data programmatically.
+
+**[Go to the live version of this API here!](https://nc-news-n3b4.onrender.com/api)**
+
+Initial requests after inactivity may be delayed by 50 seconds or more while the service spins up. You can use a tool like [Insomina](https://insomnia.rest/download) to send requests to the server.
+
+## Skills
+
+1. **Backend & API Development**
+
+    - **JavaScript, Node, Express, PostgreSQL**
+    - **CRUD Operations:** Implementing Create, Read, Update, and Delete operations.
+    - **RESTful API Design:** Structuring the API following REST principles.
+    - **Error Handling:** Implementing proper error handling and validation in the API.
+    - **Model View Controller:** Designing within MVC architecture for clear code organisation.
+    - **Supabase and Render:** Hosting the application on a cloud platform.
+
+2. **Testing & Code Quality**
+
+    - **Test Driven Development:** Using tools including Jest and SuperTest to create rigorously tested code.
+    - **Modular Code:** Writing reusable components and modular functions.
+
+3. **Project Management & Version Control**
+
+    - **GitHub:** Managing version control, including branching, merging, handling pull requests and review.
+    - **Time Management:** Working within project time frames.
+    - **Documentation:** Writing README files and other documentation to help users understand and use the app.
+
+4. **Security**
+
+    - **Environment Variables:** Using .env files to manage sensitive information like database credentials.
+    - **Input Validation:** Ensuring data integrity and security by validating user inputs.
+
+5. **Data Manipulation**
+
+    - **FS/Promises:** Handling asynchronous API requests and file operations.
+    - **JSON Handling:** Parsing and manipulating JSON data received from API requests.
+    - **SQL Queries:** Writing complex queries to retrieve and manipulate data in PostgreSQL.
 
 ## Getting Started
 
@@ -12,8 +49,8 @@ If you wish to clone this project and run it locally, please do!
 
 You'll need the following set up on your system:
 
--   [Node.js and NPM (Node Package Manager)](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm)
--   [PostgreSQL](https://www.postgresql.org/download/)
+-   [Node.js and NPM (Node Package Manager)](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm) v6.0 or higher
+-   [PostgreSQL](https://www.postgresql.org/download/) made using v14.12
 
 ### Installation
 
