@@ -1,4 +1,5 @@
 const { articleById, allArticles, patchArticle } = require("../models/articles-model");
+const { topicBySlug } = require("../models/topics.model");
 
 exports.getArticleById = (req, res, next) => {
     const { article_id } = req.params;
@@ -12,9 +13,11 @@ exports.getArticleById = (req, res, next) => {
 };
 
 exports.getArticles = (req, res, next) => {
-    const { order = "DESC", sort_by = "created_at" } = req.query;
-    allArticles(order, sort_by)
-        .then((articles) => {
+    const { order = "DESC", sort_by = "created_at", topic } = req.query;
+    const promiseArray = [allArticles(order, sort_by, topic)];
+    if (topic) promiseArray.push(topicBySlug(topic));
+    Promise.all(promiseArray)
+        .then(([articles]) => {
             res.status(200).send({ articles });
         })
         .catch((err) => {

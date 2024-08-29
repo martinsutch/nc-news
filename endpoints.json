@@ -47,6 +47,10 @@
                 "description": "Specifies the order of sorting, either ascending or descending",
                 "acceptedValues": ["asc", "desc"],
                 "default": "desc"
+            },
+            {
+                "name": "topic",
+                "description": "If included, filters results to only include articles matching the topic slug provided"
             }
         ],
         "exampleResponse": {
