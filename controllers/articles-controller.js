@@ -1,5 +1,5 @@
 const { articleById, allArticles, patchArticle } = require("../models/articles-model");
-const { topicBySlug } = require("../models/topics.model");
+const { topicBySlug } = require("../models/topics-model");
 
 exports.getArticleById = (req, res, next) => {
     const { article_id } = req.params;
