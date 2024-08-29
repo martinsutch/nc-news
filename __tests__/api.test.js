@@ -75,6 +75,14 @@ describe("/api/articles/:article_id", () => {
                     );
                 });
         });
+        test("200: Article object includes a comment_count property which is the sum of comments associated with that article", () => {
+            return request(app)
+                .get("/api/articles/1")
+                .expect(200)
+                .then(({ body: { article } }) => {
+                    expect(article).toHaveProperty("comment_count", "11");
+                });
+        });
         test("404: sends an appropriate status and error message when given a non-existant id", () => {
             return request(app)
                 .get("/api/articles/9999")
