@@ -271,6 +271,37 @@ describe("/api/articles", () => {
                     });
             });
         });
+        describe("filtering queries", () => {
+            test("200: topic query filters articles by topic given", () => {
+                return request(app)
+                    .get("/api/articles?topic=cats")
+                    .expect(200)
+                    .then(({ body: { articles } }) => {
+                        articles.forEach((article) => {
+                            expect(article.topic).toBe("cats");
+                        });
+                    });
+            });
+            test("200: Three queries work together correctly", () => {
+                return request(app)
+                    .get("/api/articles?topic=mitch&sort_by=votes&order=asc")
+                    .expect(200)
+                    .then(({ body: { articles } }) => {
+                        expect(articles).toBeSortedBy("votes", { descending: false });
+                        articles.forEach((article) => {
+                            expect(article.topic).toBe("mitch");
+                        });
+                    });
+            });
+            test("404: sends an appropriate status and error message when given a non-existant topic", () => {
+                return request(app)
+                    .get("/api/articles?topic=unicorns")
+                    .expect(404)
+                    .then(({ body: { msg } }) => {
+                        expect(msg).toBe("Topic not found");
+                    });
+            });
+        });
     });
 });
 

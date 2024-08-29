@@ -8,13 +8,16 @@ exports.articleById = (article_id) => {
     });
 };
 
-exports.allArticles = (order, sort_by) => {
-    const queryStr = format(
-        "SELECT article_id, title, topic, articles.author, articles.created_at, articles.votes, article_img_url, COUNT(comments.body) AS comment_count FROM articles LEFT JOIN comments USING (article_id) GROUP BY article_id ORDER BY articles.%I %s",
-        sort_by,
-        order
-    );
-    return db.query(queryStr).then(({ rows }) => {
+exports.allArticles = (order, sort_by, topic) => {
+    let queryString =
+        "SELECT article_id, title, topic, articles.author, articles.created_at, articles.votes, article_img_url, COUNT(comments.body) AS comment_count FROM articles LEFT JOIN comments USING (article_id)";
+    let queryValues = [];
+    if (topic) {
+        queryString += " WHERE topic = $1";
+        queryValues.push(topic);
+    }
+    queryString += format(" GROUP BY article_id ORDER BY articles.%I %s", sort_by, order);
+    return db.query(queryString, queryValues).then(({ rows }) => {
         return rows;
     });
 };
