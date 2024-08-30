@@ -1,11 +1,10 @@
-const { articleById, checkArticleById } = require("../models/articles-model");
+const { articleById } = require("../models/articles-model");
 const { commentsByArticle, postComment, deleteComment } = require("../models/comments-model");
 const { userByUsername } = require("../models/users-model");
 
 exports.getCommentsByArticle = (req, res, next) => {
     const { article_id } = req.params;
-    //check exists
-    Promise.all([checkArticleById(article_id), commentsByArticle(article_id)])
+    Promise.all([articleById(article_id), commentsByArticle(article_id)])
         .then(([_, comments]) => {
             res.status(200).send({ comments });
         })

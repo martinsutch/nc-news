@@ -462,3 +462,31 @@ describe("/api/users", () => {
         });
     });
 });
+
+describe("/api/users/:username", () => {
+    describe("GET", () => {
+        test("200: responds with a user object, which has appropriate properties", () => {
+            return request(app)
+                .get("/api/users/rogersop")
+                .expect(200)
+                .then(({ body: { user } }) => {
+                    expect(typeof user).toBe("object");
+                    expect(user).toEqual(
+                        expect.objectContaining({
+                            username: "rogersop",
+                            avatar_url: "https://avatars2.githubusercontent.com/u/24394918?s=400&v=4",
+                            name: "paul",
+                        })
+                    );
+                });
+        });
+        test("404: sends an appropriate status and error message when given a non-existant id", () => {
+            return request(app)
+                .get("/api/users/i-do-not-exist")
+                .expect(404)
+                .then(({ body: { msg } }) => {
+                    expect(msg).toBe("User not found");
+                });
+        });
+    });
+});
