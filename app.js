@@ -7,9 +7,12 @@ const {
     customErrorHandler,
     invalidInputErrorHandler,
 } = require("./error-handlers.js");
-const apiRouter = require("./routers/api-router.js")
+const apiRouter = require("./routers/api-router.js");
+const { getCommentsByArticle } = require("./controllers/comments-controller.js");
 
-app.use("/api", apiRouter)
+//app.get("/api/articles/:article_id/comments", getCommentsByArticle);
+
+app.use("/api", apiRouter);
 
 app.all("/*", routeErrorHandler);
 app.use(invalidInputErrorHandler);
