@@ -1,5 +1,5 @@
 const { articleById, allArticles, patchArticle } = require("../models/articles-model");
-const { topicBySlug } = require("../models/topics-model");
+const { checkExists } = require("./utils");
 
 exports.getArticleById = (req, res, next) => {
     const { article_id } = req.params;
@@ -15,7 +15,7 @@ exports.getArticleById = (req, res, next) => {
 exports.getArticles = (req, res, next) => {
     const { order = "DESC", sort_by = "created_at", topic } = req.query;
     const promiseArray = [allArticles(order, sort_by, topic)];
-    if (topic) promiseArray.push(topicBySlug(topic));
+    if (topic) promiseArray.push(checkExists("topics", "slug", topic));
     Promise.all(promiseArray)
         .then(([articles]) => {
             res.status(200).send({ articles });
@@ -30,7 +30,7 @@ exports.patchArticleById = (req, res, next) => {
         body: { inc_votes },
         params: { article_id },
     } = req;
-    articleById(article_id)
+    checkExists("articles", "article_id", article_id)
         .then(() => {
             return patchArticle(article_id, inc_votes);
         })

@@ -438,6 +438,70 @@ describe("/api/comments/:comment_id", () => {
                 });
         });
     });
+    describe("PATCH", () => {
+        test("200: Responds with the updated comment", () => {
+            return request(app)
+                .patch("/api/comments/1")
+                .send({ inc_votes: 10 })
+                .expect(200)
+                .then(({ body: { comment } }) => {
+                    expect(comment).toEqual(
+                        expect.objectContaining({
+                            comment_id: 1,
+                            body: "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!",
+                            votes: 26,
+                            author: "butter_bridge",
+                            article_id: 9,
+                            created_at: expect.any(String),
+                        })
+                    );
+                });
+        });
+        test("200: Ignores extra data and continues with request", () => {
+            return request(app)
+                .patch("/api/comments/1")
+                .send({ inc_votes: -10, body: "Ew." })
+                .expect(200)
+                .then(({ body: { comment } }) => {
+                    expect(comment).toEqual(
+                        expect.objectContaining({
+                            comment_id: 1,
+                            body: "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!",
+                            votes: 6,
+                            author: "butter_bridge",
+                            article_id: 9,
+                            created_at: expect.any(String),
+                        })
+                    );
+                });
+        });
+        test("400: sends an appropriate status and error message when not provided sufficient data", () => {
+            return request(app)
+                .patch("/api/comments/1")
+                .expect(400)
+                .then(({ body: { msg } }) => {
+                    expect(msg).toBe("Bad request");
+                });
+        });
+        test("400: sends an appropriate status and error message when provided wrong data type", () => {
+            return request(app)
+                .patch("/api/comments/1")
+                .send({ inc_votes: "ten" })
+                .expect(400)
+                .then(({ body: { msg } }) => {
+                    expect(msg).toBe("Bad request");
+                });
+        });
+        test("404: sends an appropriate status and error message when given a non-existant id", () => {
+            return request(app)
+                .patch("/api/comments/9999")
+                .send({ inc_votes: 10 })
+                .expect(404)
+                .then(({ body: { msg } }) => {
+                    expect(msg).toBe("Comment not found");
+                });
+        });
+    });
 });
 
 describe("/api/users", () => {
