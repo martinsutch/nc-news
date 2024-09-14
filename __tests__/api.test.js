@@ -311,6 +311,132 @@ describe("/api/articles", () => {
             });
         });
     });
+    describe("POST", () => {
+        test("201: Responds with the posted article", () => {
+            return request(app)
+                .post("/api/articles")
+                .send({
+                    author: "icellusedkars",
+                    title: "Example Title",
+                    body: "Example body of text",
+                    topic: "paper",
+                    article_img_url:
+                        "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+                })
+                .expect(201)
+                .then(({ body: { article } }) => {
+                    expect(article).toEqual(
+                        expect.objectContaining({
+                            article_id: expect.any(Number),
+                            author: "icellusedkars",
+                            title: "Example Title",
+                            body: "Example body of text",
+                            topic: "paper",
+                            article_img_url:
+                                "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+                            votes: 0,
+                            created_at: expect.any(String),
+                            comment_count: 0,
+                        })
+                    );
+                });
+        });
+        test("201: Provides a default URL if not provided with one", () => {
+            return request(app)
+                .post("/api/articles")
+                .send({
+                    author: "icellusedkars",
+                    title: "Example Title",
+                    body: "Example body of text",
+                    topic: "paper",
+                })
+                .expect(201)
+                .then(({ body: { article } }) => {
+                    expect(article).toEqual(
+                        expect.objectContaining({
+                            article_id: expect.any(Number),
+                            author: "icellusedkars",
+                            title: "Example Title",
+                            body: "Example body of text",
+                            topic: "paper",
+                            article_img_url: expect.any(String),
+                            votes: 0,
+                            created_at: expect.any(String),
+                            comment_count: 0,
+                        })
+                    );
+                });
+        });
+        test("400: sends an appropriate status and error message when not provided sufficient data (no title)", () => {
+            return request(app)
+                .post("/api/articles")
+                .send({
+                    author: "icellusedkars",
+                    body: "Example body of text",
+                    topic: "paper",
+                })
+                .expect(400)
+                .then(({ body: { msg } }) => {
+                    expect(msg).toBe("Bad request");
+                });
+        });
+        test("400: sends an appropriate status and error message when not provided sufficient data (no body)", () => {
+            return request(app)
+                .post("/api/articles")
+                .send({
+                    author: "icellusedkars",
+                    title: "Example Title",
+                    topic: "paper",
+                })
+                .expect(400)
+                .then(({ body: { msg } }) => {
+                    expect(msg).toBe("Bad request");
+                });
+        });
+        test("400: sends an appropriate status and error message when given an invalid URL", () => {
+            return request(app)
+                .post("/api/articles")
+                .send({
+                    author: "icellusedkars",
+                    title: "Example Title",
+                    body: "Example body of text",
+                    topic: "paper",
+                    article_img_url: "i-am-not-a-url",
+                })
+                .expect(400)
+                .then(({ body: { msg } }) => {
+                    expect(msg).toBe("Bad request");
+                });
+        });
+        test("404: sends an appropriate status and error message when given an non-existant username", () => {
+            return request(app)
+                .post("/api/articles")
+                .send({
+                    author: "jellybeans",
+                    title: "Example Title",
+                    body: "Example body of text",
+                    topic: "paper",
+                })
+                .expect(404)
+                .then(({ body: { msg } }) => {
+                    expect(msg).toBe("User not found");
+                });
+        });
+        test("404: sends an appropriate status and error message when given an non-existant topic", () => {
+            return request(app)
+                .post("/api/articles")
+                .send({
+                    author: "icellusedkars",
+                    title: "Example Title",
+                    body: "Example body of text",
+                    topic: "giraffes",
+                })
+                .expect(404)
+                .then(({ body: { msg } }) => {
+                    expect(msg).toBe("Topic not found");
+                });
+        });
+    });
 });
 
 describe("/api/articles/:article_id/comments", () => {
